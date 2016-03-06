@@ -1,0 +1,120 @@
+# Notes:
+# - Minimal appveyor.yml file is an empty file. All sections are optional.
+# - Indent each level of configuration with 2 spaces. Do not use tabs!
+# - All section names are case-sensitive.
+# - Section names should be unique on each level.
+
+#---------------------------------#
+#  general configuration          #
+#---------------------------------#
+
+# version format
+version: '{branch}-{build}'
+
+# Do not build on tags (GitHub only)
+skip_tags: true
+
+# avoid malicious attempt via pull requests
+branches:
+  only:
+    - master
+
+
+#---------------------------------#
+#  environment configuration      #
+#---------------------------------#
+
+# environment variables
+# build system info: http://www.appveyor.com/docs/installed-software
+os: Visual Studio 2015
+
+environment:
+  PROJECT_DIR: &PROJECT_DIR c:\project
+
+  SQLITE_DIR: c:\sqlite
+  SQLITE_VERSION: 3.11.1
+  SQLITE_URL: https://www.sqlite.org/2016/sqlite-amalgamation-3110100.zip
+
+  CMAKE_GEN_X86: Visual Studio 14 2015
+
+  SOL_LIBCHEWING_FILE: INSTALL.vcxproj
+  MSBUILD_LIBCHEWING_X86: /m /p:Configuration=Release;Platform=Win32
+
+  SOL_CHEWINGEDITOR_FILE: chewing-editor.sln
+  MSBUILD_CHEWINGEDITOR_X86: /m /p:Configuration=Release;Platform=Win32 /t:chewing-editor
+
+# clone directory
+clone_folder: *PROJECT_DIR
+
+
+#---------------------------------#
+#  build configuration            #
+#---------------------------------#
+
+# scripts to run before build
+before_build:
+  # git submodules
+  - cd "%PROJECT_DIR%"
+  - git submodule update --init --remote --depth 1 --recursive
+
+  # update sqlite-amalgamation
+  - cd \
+  - appveyor DownloadFile "%SQLITE_URL%" -FileName "sqlite.zip"
+  - 7z e "sqlite.zip" -o"%SQLITE_DIR%"
+  - copy /Y "%SQLITE_DIR%\*" "%PROJECT_DIR%\libchewing\thirdparty\sqlite-amalgamation"
+
+  # patch libchewing
+  - copy "%PROJECT_DIR%\src\libchewing\*.patch" "%PROJECT_DIR%\libchewing"
+  - cd "%PROJECT_DIR%\libchewing"
+  - git apply "0001-Use-static-linking-to-libraries.patch"
+
+  # build libchewing
+  - cd "%PROJECT_DIR%\libchewing"
+  - mkdir "build" && cd "build"
+  - cmake -G "%CMAKE_GEN_X86%" "../"
+  - msbuild %SOL_LIBCHEWING_FILE% %MSBUILD_LIBCHEWING_X86%
+  - move "%PROGRAMFILES(x86)%\libchewing" "%PROJECT_DIR%\chewing-editor\libchewing"
+  # some .lib files are left not installed
+  - copy /Y "%PROJECT_DIR%\libchewing\build\Release\*" "%PROJECT_DIR%\chewing-editor\libchewing\lib"
+
+  # prepare Qt
+  - 7z x "%PROJECT_DIR%\src\chewing-editor\libs.7z" -o"c:\" > nul
+  - set PATH=%PATH%;c:\qt5_32\bin;
+
+# to run your custom scripts instead of automatic MSBuild
+build_script:
+  # patch chewing-editor
+  - copy "%PROJECT_DIR%\src\chewing-editor\*.patch" "%PROJECT_DIR%\chewing-editor"
+  - cd "%PROJECT_DIR%\chewing-editor"
+  - git apply "0001-Add-path-to-libs.patch" "0002-zlib-doesn-t-have-have-SAFESEH.patch"
+  # build
+  - cd "%PROJECT_DIR%\chewing-editor"
+  - mkdir "build" && cd "build"
+  - cmake -G "%CMAKE_GEN_X86%" "../"
+  - msbuild %SOL_CHEWINGEDITOR_FILE% %MSBUILD_CHEWINGEDITOR_X86%
+
+# scripts to run before deployment
+after_build:
+  # prepare for artifacts packaging
+  - cd "%PROJECT_DIR%"
+  - copy "chewing-editor\build\Release\chewing-editor.exe" "%PROJECT_DIR%"  # the artifact must reside at the source repo root
+  - 'powershell -Command "& { (Get-FileHash -Algorithm SHA1 "chewing-editor.exe").hash; }" > "chewing-editor.sha1"'
+
+
+#---------------------------------#
+#  tests configuration            #
+#---------------------------------#
+
+# to disable automatic tests
+test: off
+
+
+#---------------------------------#
+#  artifacts configuration        #
+#---------------------------------#
+
+artifacts:
+  - path: chewing-editor.exe
+    name: executable
+  - path: chewing-editor.sha1
+    name: checksum

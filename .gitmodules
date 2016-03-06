@@ -1,0 +1,6 @@
+[submodule "chewing-editor"]
+	path = chewing-editor
+	url = https://github.com/chewing/chewing-editor.git
+[submodule "libchewing"]
+	path = libchewing
+	url = https://github.com/chewing/libchewing.git

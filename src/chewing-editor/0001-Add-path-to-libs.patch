@@ -1,0 +1,36 @@
+From d065aca647bc00e19dfcd08b57f2919947b16850 Mon Sep 17 00:00:00 2001
+From: Chocobo1 <Chocobo1@users.noreply.github.com>
+Date: Sat, 5 Mar 2016 16:45:04 +0800
+Subject: [PATCH] Add path to libs
+
+---
+ CMakeLists.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8f11c19..95b1da2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -59,9 +59,9 @@ endif()
+ 
+ # libchewing
+ # MODIFY IF NEEDED, e.g. ${CMAKE_CURRENT_SOURCE_DIR}/libchewing/lib/*.lib
+-set(CHEWING_LIBRARIES )
++set(CHEWING_LIBRARIES ${CMAKE_CURRENT_SOURCE_DIR}/libchewing/lib/*.lib)
+ # MODIFY IF NEEDED, e.g. ${CMAKE_CURRENT_SOURCE_DIR}/libchewing/include/chewing
+-set(CHEWING_INCLUDE_DIRS )
++set(CHEWING_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/libchewing/include/chewing)
+ 
+ if (CHEWING_INCLUDE_DIRS AND CHEWING_LIBRARIES)
+     # if all listed variables are TRUE
+@@ -185,6 +185,7 @@ if(MSVC)
+         "${_qt5Widgets_install_prefix}/lib/qtharfbuzzng.lib"
+         "${_qt5Widgets_install_prefix}/lib/Qt5PlatformSupport.lib"
+         "${_qt5Widgets_install_prefix}/plugins/platforms/qwindows.lib"
++		"C:/zlib_32/lib/zlib.lib"
+         imm32.lib
+         winmm.lib
+         Ws2_32.lib
+-- 
+2.7.1.windows.2
+
