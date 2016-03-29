@@ -57,7 +57,7 @@ clone_depth: 1
 before_build:
   # git submodules
   - cd "%PROJECT_DIR%"
-  - git submodule update --init --remote --depth 1 --recursive
+  - git submodule update --init --remote --recursive
 
   # update sqlite-amalgamation
   - cd \
