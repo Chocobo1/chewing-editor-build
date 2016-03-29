@@ -1,6 +1,5 @@
 From f1c7ca16214736e65e0ac91d4e56676bd9971562 Mon Sep 17 00:00:00 2001
 From: Chocobo1 <Chocobo1@users.noreply.github.com>
-Date: Fri, 4 Mar 2016 15:24:57 +0800
 Subject: [PATCH] Use static linking to libraries
 
 ---
@@ -49,6 +48,4 @@ index 0000000..7d4d784
 +    set(CMAKE_EXE_LINKER_FLAGS_RELEASE      "/OPT:REF /OPT:ICF")
 +    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT "/MT /Zi /O2 /Ob1 /D NDEBUG")
 +endif()
--- 
-2.7.1.windows.2
-
+--

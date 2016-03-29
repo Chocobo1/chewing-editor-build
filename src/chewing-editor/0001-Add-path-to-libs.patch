@@ -1,6 +1,5 @@
 From d065aca647bc00e19dfcd08b57f2919947b16850 Mon Sep 17 00:00:00 2001
 From: Chocobo1 <Chocobo1@users.noreply.github.com>
-Date: Sat, 5 Mar 2016 16:45:04 +0800
 Subject: [PATCH] Add path to libs
 
 ---
@@ -31,6 +30,4 @@ index 8f11c19..95b1da2 100644
          imm32.lib
          winmm.lib
          Ws2_32.lib
--- 
-2.7.1.windows.2
-
+--
